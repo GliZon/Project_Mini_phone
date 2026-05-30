@@ -18,6 +18,13 @@ idf_component_register(
 
         "widgets/menu_button.c"
 
+        "services/settings_service.c"
+        "services/message_service.c"
+        "services/storage_service.c"
+
+        "screens/common/list_screen.c"
+        "screens/common/text_editor.c"
+
     INCLUDE_DIRS
         "include"
 

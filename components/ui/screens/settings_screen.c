@@ -1,18 +1,73 @@
 #include "settings_screen.h"
-
+#include "list_screen.h"
 #include "screen_manager.h"
 #include "ui_input.h"
 // #include "app_state.h"
 #include "settings_service.h"
 #include "lvgl.h"
 
-#include <stdio.h>
+// #include <stdio.h>
 
-
+static list_screen_model_t g_settings_model;
 
 static settings_screen_t g_settings;
 
 
+static const char *settings_get_item_text(
+    void *context,
+    uint16_t index
+)
+{
+    switch(index)
+    {
+        case SETTINGS_ITEM_DEVICE_NAME:
+            return "Name";
+
+        case SETTINGS_ITEM_DEVICE_TYPE:
+            return "Type";
+
+        case SETTINGS_ITEM_MESSAGE_MODE:
+            return "MsgMode";
+
+        default:
+            return "";
+    }
+}
+
+
+static void settings_on_item_selected(
+    void *context,
+    uint16_t index
+)
+{
+    switch(index)
+    {
+        case SETTINGS_ITEM_DEVICE_NAME:
+
+            /*
+             * Future:
+             * text_editor_open(...)
+             */
+
+            break;
+
+        case SETTINGS_ITEM_DEVICE_TYPE:
+
+            settings_service_cycle_device_type();
+
+            break;
+
+        case SETTINGS_ITEM_MESSAGE_MODE:
+
+            settings_service_cycle_message_mode();
+
+            break;
+
+        default:
+
+            break;
+    }
+}
 
 /*
  * Refresh
@@ -20,72 +75,37 @@ static settings_screen_t g_settings;
 
 static void settings_screen_refresh(void)
 {
-    // app_state_t *state =
-    //     app_state_get();
-
-
-
-    /*
-     * Device Name
-     */
-
+    // Device Labels
     lv_label_set_text(
-        g_settings.items[
-            SETTINGS_ITEM_DEVICE_NAME
-        ].value,
-
-        // state->device_name
+        g_settings.items[SETTINGS_ITEM_DEVICE_NAME].value,
         settings_service_get_device_name()
     );
 
-
-
-    /*
-     * Device Type
-     */
-
+    // Device Types
     lv_label_set_text(
         g_settings.items[
             SETTINGS_ITEM_DEVICE_TYPE
         ].value,
-
-        // device_type_to_string(
-        //     state->device_type
-        // )
+        
         device_type_to_string(
-        settings_service_get_device_type()
+            settings_service_get_device_type()
         )
     );
 
-
-
-    /*
-     * Message Mode
-     */
-
+    // Message Mode
     lv_label_set_text(
         g_settings.items[
             SETTINGS_ITEM_MESSAGE_MODE
         ].value,
 
-        // message_mode_to_string(
-        //     state->message_mode
-        // )
         message_mode_to_string(
             settings_service_get_message_mode()
         )
     );
 }
 
-
-
-/*
- * Setting Row Event
- */
-
-static void setting_item_event_cb(
-    lv_event_t *e
-)
+// Settings Rows Events
+static void setting_item_event_cb(lv_event_t *e)
 {
     if(
         lv_event_get_code(e)
@@ -95,134 +115,30 @@ static void setting_item_event_cb(
         return;
     }
 
-
-
     lv_obj_t *obj =
         lv_event_get_target(e);
 
-
-
-    settings_item_id_t index =
-        (settings_item_id_t)
+    uint16_t index =
+        (uint16_t)
         (uintptr_t)
         lv_obj_get_user_data(obj);
 
-
-
-    // app_state_t *state =
-    //     app_state_get();
-
-
-
-    switch(index)
+    if(
+        index < g_settings_model.item_count &&
+        g_settings_model.on_item_selected
+    )
     {
-        /*
-         * Device Name
-         */
-
-        case SETTINGS_ITEM_DEVICE_NAME:
-
-            /*
-             * Future:
-             * Open keyboard screen
-             */
-
-            break;
-
-
-
-        /*
-         * Device Type
-         */
-
-        case SETTINGS_ITEM_DEVICE_TYPE:
-
-            // switch(state->device_type)
-            // {
-            //     case DEVICE_TYPE_D:
-
-            //         state->device_type =
-            //             DEVICE_TYPE_G;
-
-            //         break;
-
-
-
-            //     case DEVICE_TYPE_G:
-
-            //         state->device_type =
-            //             DEVICE_TYPE_C;
-
-            //         break;
-
-
-
-            //     case DEVICE_TYPE_C:
-
-            //         state->device_type =
-            //             DEVICE_TYPE_D;
-
-            //         break;
-            // }
-            settings_service_cycle_device_type();
-            break;
-
-
-
-        /*
-         * Message Mode
-         */
-
-        case SETTINGS_ITEM_MESSAGE_MODE:
-
-            // switch(state->message_mode)
-            // {
-            //     case MESSAGE_MODE_NONE:
-
-            //         state->message_mode =
-            //             MESSAGE_MODE_INSTANT;
-
-            //         break;
-
-
-
-            //     case MESSAGE_MODE_INSTANT:
-
-            //         state->message_mode =
-            //             MESSAGE_MODE_WRITE;
-
-            //         break;
-
-
-
-            //     case MESSAGE_MODE_WRITE:
-
-            //         state->message_mode =
-            //             MESSAGE_MODE_NONE;
-
-            //         break;
-            // }
-            settings_service_cycle_message_mode();
-
-            break;
-
-
-
-        default:
-            break;
+        g_settings_model.on_item_selected(
+            g_settings_model.context,
+            index
+        );
     }
-
-
 
     settings_screen_refresh();
 }
 
 
-
-/*
- * Back
- */
-
+//Back
 static void back_event_cb(
     lv_event_t *e
 )
@@ -238,12 +154,7 @@ static void back_event_cb(
     }
 }
 
-
-
-/*
- * Event Handler
- */
-
+// Event Handler
 void settings_screen_handle_event(
     ui_event_t *event
 )
@@ -256,11 +167,7 @@ void settings_screen_handle_event(
 }
 
 
-
-/*
- * Lifecycle
- */
-
+// Lifecycle
 void settings_screen_destroy(void)
 {
 }
@@ -280,50 +187,31 @@ void settings_screen_update(
 }
 
 
-
-/*
- * Create
- */
-
+// Create
 void settings_screen_create(void)
 {
     lv_obj_t *screen =
         lv_screen_active();
 
-
-
-    /*
-     * Background
-     */
-
+    // Background
     lv_obj_set_style_bg_color(
         screen,
         lv_color_black(),
         0
     );
 
+    g_settings_model.title = "Settings";
+    g_settings_model.item_count = SETTINGS_ITEM_COUNT;
+    g_settings_model.get_item_text = settings_get_item_text;
+    g_settings_model.on_item_selected = settings_on_item_selected;
+    g_settings_model.context = NULL;
 
+    // Group
+    g_settings.group = lv_group_create();
 
-    /*
-     * Group
-     */
-
-    g_settings.group =
-        lv_group_create();
-
-
-
-    /*
-     * Title
-     */
-
-    g_settings.title =
-        lv_label_create(screen);
-
-    lv_label_set_text(
-        g_settings.title,
-        "Settings"
-    );
+    // Title
+    g_settings.title = lv_label_create(screen);
+    lv_label_set_text(g_settings.title, g_settings_model.title);
 
     lv_obj_align(
         g_settings.title,
@@ -334,35 +222,27 @@ void settings_screen_create(void)
 
 
 
-    /*
-     * Setting Labels
-     */
+    // /*
+    //  * Setting Labels
+    //  */
 
-    const char *labels[
-        SETTINGS_ITEM_COUNT
-    ] =
-    {
-        "Name",
-        "Type",
-        "MsgMode"
-    };
+    // const char *labels[
+    //     SETTINGS_ITEM_COUNT
+    // ] =
+    // {
+    //     "Name",
+    //     "Type",
+    //     "MsgMode"
+    // };
 
-
-
-    /*
-     * Create Rows
-     */
-
+    // Create Rows
     for(
         int i = 0;
         i < SETTINGS_ITEM_COUNT;
         i++
     )
     {
-        /*
-         * Container
-         */
-
+        // Container
         g_settings.items[i].container =
             lv_btn_create(screen);
 
@@ -379,24 +259,14 @@ void settings_screen_create(void)
             25 + (i * 28)
         );
 
-
-
-        /*
-         * Style
-         */
-
+        // Styles
         lv_obj_set_style_radius(
             g_settings.items[i].container,
             5,
             0
         );
 
-
-
-        /*
-         * Default
-         */
-
+        // Default
         lv_obj_set_style_bg_color(
             g_settings.items[i].container,
             lv_color_hex(0x202020),
@@ -415,12 +285,7 @@ void settings_screen_create(void)
             LV_PART_MAIN | LV_STATE_DEFAULT
         );
 
-
-
-        /*
-         * Focused
-         */
-
+        // Focused
         lv_obj_set_style_bg_color(
             g_settings.items[i].container,
             lv_color_hex(0x303030),
@@ -440,25 +305,15 @@ void settings_screen_create(void)
             ),
             LV_PART_MAIN | LV_STATE_FOCUSED
         );
-
-
-
-        /*
-         * Remove Shadow
-         */
-
+        
+        // Remove Shadows
         lv_obj_set_style_shadow_width(
             g_settings.items[i].container,
             0,
             0
         );
-
-
-
-        /*
-         * Left Label
-         */
-
+        
+        // Left Label
         g_settings.items[i].label =
             lv_label_create(
                 g_settings.items[i].container
@@ -466,7 +321,10 @@ void settings_screen_create(void)
 
         lv_label_set_text(
             g_settings.items[i].label,
-            labels[i]
+            g_settings_model.get_item_text(
+                g_settings_model.context,
+                i
+            )
         );
 
         lv_obj_align(
@@ -475,13 +333,8 @@ void settings_screen_create(void)
             5,
             0
         );
-
-
-
-        /*
-         * Right Value
-         */
-
+        
+        // Right Value
         g_settings.items[i].value =
             lv_label_create(
                 g_settings.items[i].container
@@ -494,23 +347,13 @@ void settings_screen_create(void)
             0
         );
 
-
-
-        /*
-         * User Data
-         */
-
+        // User Data
         lv_obj_set_user_data(
             g_settings.items[i].container,
             (void *)(uintptr_t)i
         );
 
-
-
-        /*
-         * Event
-         */
-
+        // Event
         lv_obj_add_event_cb(
             g_settings.items[i].container,
             setting_item_event_cb,
@@ -518,24 +361,14 @@ void settings_screen_create(void)
             NULL
         );
 
-
-
-        /*
-         * Group
-         */
-
+        // Group
         lv_group_add_obj(
             g_settings.group,
             g_settings.items[i].container
         );
     }
 
-
-
-    /*
-     * Back Button
-     */
-
+    // Back Button
     g_settings.btn_back =
         lv_btn_create(screen);
 

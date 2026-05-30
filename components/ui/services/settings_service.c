@@ -1,5 +1,5 @@
 #include "settings_service.h"
-
+#include <string.h>
 #include "app_state.h"
 
 
@@ -85,4 +85,23 @@ device_type_t settings_service_get_device_type(void)
 message_mode_t settings_service_get_message_mode(void)
 {
     return app_state_get()->message_mode;
+}
+
+
+void settings_service_set_device_name(
+    const char *name
+)
+{
+    app_state_t *state =
+        app_state_get();
+
+    strncpy(
+        state->device_name,
+        name,
+        sizeof(state->device_name) - 1
+    );
+
+    state->device_name[
+        sizeof(state->device_name) - 1
+    ] = '\0';
 }
