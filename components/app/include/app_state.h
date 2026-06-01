@@ -6,7 +6,28 @@
 
 #define DEVICE_NAME_LEN    32
 #define MAX_DEVICES        5
+#define MAX_QUICK_MESSAGES   9
+#define QUICK_MESSAGE_LEN    64
+#define MESSAGE_DRAFT_LEN    256
 
+
+/*
+ * Message State
+ */
+
+typedef struct
+{
+    char quick_messages[
+        MAX_QUICK_MESSAGES
+    ][
+        QUICK_MESSAGE_LEN
+    ];
+
+    char draft[
+        MESSAGE_DRAFT_LEN
+    ];
+
+} message_state_t;
 
 
 /*
@@ -86,6 +107,7 @@ typedef struct
 
     /*Messaging*/
     message_mode_t message_mode;
+    message_state_t message;
     
     /*
      * Communication

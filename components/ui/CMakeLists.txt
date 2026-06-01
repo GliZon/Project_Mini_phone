@@ -21,9 +21,10 @@ idf_component_register(
         "services/settings_service.c"
         "services/message_service.c"
         "services/storage_service.c"
+        "services/comm_service.c"
 
         "screens/common/list_screen.c"
-        "screens/common/text_editor.c"
+        "screens/common/text_editor_screen.c"
 
     INCLUDE_DIRS
         "include"

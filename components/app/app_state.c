@@ -8,6 +8,7 @@ static app_state_t g_app_state;
 
 
 
+
 void app_state_init(void)
 {
     memset(
@@ -24,6 +25,23 @@ void app_state_init(void)
         g_app_state.device_name,
         "DEVICE"
     );
+
+        strcpy(
+        g_app_state.message.quick_messages[0],
+        "HELP"
+    );
+
+    strcpy(
+        g_app_state.message.quick_messages[1],
+        "COME HERE"
+    );
+
+    strcpy(
+        g_app_state.message.quick_messages[2],
+        "LOW BATTERY"
+    );
+
+    g_app_state.message.draft[0] = '\0';
 
     g_app_state.device_type = DEVICE_TYPE_D;
     

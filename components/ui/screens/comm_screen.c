@@ -1,26 +1,20 @@
 #include "comm_screen.h"
-
+#include "comm_service.h"
 #include "screen_manager.h"
 #include "ui_input.h"
 
 #include "lvgl.h"
 
-#include <stdio.h>
 #include <stdint.h>
-
-
+#include <stdio.h>
 
 static comm_screen_t g_comm;
-
-
 
 /*
  * Forward Declarations
  */
 
 static void comm_screen_refresh(void);
-
-static void fake_scan_results(void);
 
 static void scan_event_cb(
     lv_event_t *e
@@ -34,26 +28,18 @@ static void device_event_cb(
     lv_event_t *e
 );
 
-
-
 /*
  * Refresh UI
  */
 
 static void comm_screen_refresh(void)
 {
-    app_state_t *state =
-        app_state_get();
-
     char buffer[64];
 
+    comm_state_t state =
+        comm_service_get_state();
 
-
-    /*
-     * Status
-     */
-
-    switch(state->comm_state)
+    switch(state)
     {
         case COMM_STATE_IDLE:
 
@@ -64,8 +50,6 @@ static void comm_screen_refresh(void)
 
             break;
 
-
-
         case COMM_STATE_SCANNING:
 
             lv_label_set_text(
@@ -75,15 +59,13 @@ static void comm_screen_refresh(void)
 
             break;
 
-
-
         case COMM_STATE_DEVICE_LIST:
 
             snprintf(
                 buffer,
                 sizeof(buffer),
                 "Devices Found: %d",
-                state->device_count
+                comm_service_get_device_count()
             );
 
             lv_label_set_text(
@@ -92,93 +74,84 @@ static void comm_screen_refresh(void)
             );
 
             break;
-
-
 
         case COMM_STATE_PAIRING:
+        {
+            uint8_t selected =
+                comm_service_get_selected_device();
 
-            snprintf(
-                buffer,
-                sizeof(buffer),
-                "Pairing: %s",
+            device_info_t *device =
+                comm_service_get_device(
+                    selected
+                );
 
-                state->devices[
-                    state->selected_device
-                ].name
-            );
+            if(device)
+            {
+                snprintf(
+                    buffer,
+                    sizeof(buffer),
+                    "Pairing: %s",
+                    device->name
+                );
 
-            lv_label_set_text(
-                g_comm.status,
-                buffer
-            );
+                lv_label_set_text(
+                    g_comm.status,
+                    buffer
+                );
+            }
 
             break;
-
-
+        }
 
         case COMM_STATE_RESULT:
 
             lv_label_set_text(
                 g_comm.status,
 
-                state->pairing_success ?
-                "Pair Success" :
-                "Pair Failed"
+                comm_service_get_pairing_result()
+                    ? "Pair Success"
+                    : "Pair Failed"
             );
 
             break;
     }
 
-
-
     /*
      * Device Rows
      */
 
+    uint8_t device_count = comm_service_get_device_count();
+
     for(int i = 0; i < MAX_DEVICES; i++)
     {
-        if(i < state->device_count)
+        if(i < device_count)
         {
-            /*
-             * Name
-             */
+            device_info_t *device =
+                comm_service_get_device(i);
 
-            lv_label_set_text(
-                g_comm.device_items[i].name,
-                state->devices[i].name
-            );
+            if(device)
+            {
+                lv_label_set_text(
+                    g_comm.device_items[i].name,
+                    device->name
+                );
 
+                lv_label_set_text(
+                    g_comm.device_items[i].status,
 
+                    device->paired
+                        ? "[P]"
+                        : "[-]"
+                );
 
-            /*
-             * Pair Status
-             */
-
-            lv_label_set_text(
-                g_comm.device_items[i].status,
-
-                state->devices[i].paired ?
-                "[P]" :
-                "[-]"
-            );
-
-
-
-            /*
-             * Show Row
-             */
-
-            lv_obj_clear_flag(
-                g_comm.device_items[i].container,
-                LV_OBJ_FLAG_HIDDEN
-            );
+                lv_obj_clear_flag(
+                    g_comm.device_items[i].container,
+                    LV_OBJ_FLAG_HIDDEN
+                );
+            }
         }
         else
         {
-            /*
-             * Hide Row
-             */
-
             lv_obj_add_flag(
                 g_comm.device_items[i].container,
                 LV_OBJ_FLAG_HIDDEN
@@ -186,77 +159,6 @@ static void comm_screen_refresh(void)
         }
     }
 }
-
-
-
-/*
- * Fake Scan Results
- */
-
-static void fake_scan_results(void)
-{
-    app_state_t *state =
-        app_state_get();
-
-
-
-    state->comm_state =
-        COMM_STATE_DEVICE_LIST;
-
-    state->device_count =
-        3;
-
-
-
-    /*
-     * Device A
-     */
-
-    snprintf(
-        state->devices[0].name,
-        DEVICE_NAME_LEN,
-        "DEVICE_A"
-    );
-
-    state->devices[0].paired =
-        true;
-
-
-
-    /*
-     * Device B
-     */
-
-    snprintf(
-        state->devices[1].name,
-        DEVICE_NAME_LEN,
-        "DEVICE_B"
-    );
-
-    state->devices[1].paired =
-        false;
-
-
-
-    /*
-     * Device C
-     */
-
-    snprintf(
-        state->devices[2].name,
-        DEVICE_NAME_LEN,
-        "DEVICE_C"
-    );
-
-    state->devices[2].paired =
-        false;
-
-
-
-    comm_screen_refresh();
-}
-
-
 
 /*
  * Device Selected
@@ -274,62 +176,20 @@ static void device_event_cb(
         return;
     }
 
-
-
     lv_obj_t *obj =
         lv_event_get_target(e);
 
-
-
-    int index =
-        (int)(uintptr_t)
+    uint8_t index =
+        (uint8_t)
+        (uintptr_t)
         lv_obj_get_user_data(obj);
 
-
-
-    app_state_t *state =
-        app_state_get();
-
-
-
-    /*
-     * Selected Device
-     */
-
-    state->selected_device =
-        index;
-
-
-
-    /*
-     * Pairing State
-     */
-
-    state->comm_state =
-        COMM_STATE_PAIRING;
-
-    comm_screen_refresh();
-
-
-
-    /*
-     * TEMP
-     * Fake Pairing Result
-     */
-
-    state->pairing_success =
-        true;
-
-    state->devices[index].paired =
-        true;
-
-    state->comm_state =
-        COMM_STATE_RESULT;
+    comm_service_pair_device(
+        index
+    );
 
     comm_screen_refresh();
 }
-
-
 
 /*
  * Scan Button
@@ -347,38 +207,10 @@ static void scan_event_cb(
         return;
     }
 
-
-
-    app_state_t *state =
-        app_state_get();
-
-
-
-    /*
-     * Scanning State
-     */
-
-    state->comm_state =
-        COMM_STATE_SCANNING;
-
-    state->device_count =
-        0;
-
-
+    comm_service_start_scan();
 
     comm_screen_refresh();
-
-
-
-    /*
-     * TEMP
-     * Fake Scan
-     */
-
-    fake_scan_results();
 }
-
-
 
 /*
  * Back Button
@@ -399,8 +231,6 @@ static void back_event_cb(
     }
 }
 
-
-
 /*
  * Event Handler
  */
@@ -415,8 +245,6 @@ void comm_screen_handle_event(
             break;
     }
 }
-
-
 
 /*
  * Lifecycle
@@ -440,8 +268,6 @@ void comm_screen_update(
 {
 }
 
-
-
 /*
  * Screen Create
  */
@@ -450,8 +276,6 @@ void comm_screen_create(void)
 {
     lv_obj_t *screen =
         lv_screen_active();
-
-
 
     /*
      * Background
@@ -463,16 +287,12 @@ void comm_screen_create(void)
         0
     );
 
-
-
     /*
      * Group
      */
 
     g_comm.group =
         lv_group_create();
-
-
 
     /*
      * Title
@@ -493,8 +313,6 @@ void comm_screen_create(void)
         3
     );
 
-
-
     /*
      * Status
      */
@@ -509,18 +327,16 @@ void comm_screen_create(void)
         22
     );
 
-
-
     /*
      * Device Rows
      */
 
-    for(int i = 0; i < MAX_DEVICES; i++)
+    for(
+        int i = 0;
+        i < MAX_DEVICES;
+        i++
+    )
     {
-        /*
-         * Container
-         */
-
         g_comm.device_items[i].container =
             lv_btn_create(screen);
 
@@ -537,22 +353,10 @@ void comm_screen_create(void)
             40 + (i * 24)
         );
 
-
-
-        /*
-         * Store Index
-         */
-
         lv_obj_set_user_data(
             g_comm.device_items[i].container,
             (void *)(uintptr_t)i
         );
-
-
-
-        /*
-         * Default Style
-         */
 
         lv_obj_set_style_radius(
             g_comm.device_items[i].container,
@@ -572,35 +376,13 @@ void comm_screen_create(void)
             LV_PART_MAIN | LV_STATE_DEFAULT
         );
 
-        lv_obj_set_style_border_color(
-            g_comm.device_items[i].container,
-            lv_color_hex(0x404040),
-            LV_PART_MAIN | LV_STATE_DEFAULT
-        );
-
-
-
-        /*
-         * Focus Style
-         */
-
         lv_obj_set_style_bg_color(
             g_comm.device_items[i].container,
-            lv_palette_main(LV_PALETTE_BLUE),
+            lv_palette_main(
+                LV_PALETTE_BLUE
+            ),
             LV_PART_MAIN | LV_STATE_FOCUSED
         );
-
-        lv_obj_set_style_border_color(
-            g_comm.device_items[i].container,
-            lv_color_white(),
-            LV_PART_MAIN | LV_STATE_FOCUSED
-        );
-
-
-
-        /*
-         * Name Label
-         */
 
         g_comm.device_items[i].name =
             lv_label_create(
@@ -614,12 +396,6 @@ void comm_screen_create(void)
             0
         );
 
-
-
-        /*
-         * Status Label
-         */
-
         g_comm.device_items[i].status =
             lv_label_create(
                 g_comm.device_items[i].container
@@ -632,12 +408,6 @@ void comm_screen_create(void)
             0
         );
 
-
-
-        /*
-         * Click Event
-         */
-
         lv_obj_add_event_cb(
             g_comm.device_items[i].container,
             device_event_cb,
@@ -645,30 +415,16 @@ void comm_screen_create(void)
             NULL
         );
 
-
-
-        /*
-         * Hidden Initially
-         */
-
         lv_obj_add_flag(
             g_comm.device_items[i].container,
             LV_OBJ_FLAG_HIDDEN
         );
-
-
-
-        /*
-         * Add To Navigation
-         */
 
         lv_group_add_obj(
             g_comm.group,
             g_comm.device_items[i].container
         );
     }
-
-
 
     /*
      * Scan Button
@@ -690,8 +446,6 @@ void comm_screen_create(void)
         -10
     );
 
-
-
     lv_obj_t *scan_label =
         lv_label_create(
             g_comm.btn_scan
@@ -706,16 +460,12 @@ void comm_screen_create(void)
         scan_label
     );
 
-
-
     lv_obj_add_event_cb(
         g_comm.btn_scan,
         scan_event_cb,
         LV_EVENT_CLICKED,
         NULL
     );
-
-
 
     /*
      * Back Button
@@ -737,23 +487,19 @@ void comm_screen_create(void)
         -10
     );
 
-
-
-    lv_obj_t *label_back =
+    lv_obj_t *back_label =
         lv_label_create(
             g_comm.btn_back
         );
 
     lv_label_set_text(
-        label_back,
+        back_label,
         "Back"
     );
 
     lv_obj_center(
-        label_back
+        back_label
     );
-
-
 
     lv_obj_add_event_cb(
         g_comm.btn_back,
@@ -762,10 +508,8 @@ void comm_screen_create(void)
         NULL
     );
 
-
-
     /*
-     * Navigation Group
+     * Navigation
      */
 
     lv_group_add_obj(
@@ -778,38 +522,19 @@ void comm_screen_create(void)
         g_comm.btn_back
     );
 
-
-
-    /*
-     * Input
-     */
-
     ui_input_set_group(
         g_comm.group
     );
-
-
 
     lv_group_focus_obj(
         g_comm.btn_scan
     );
 
-
-
     /*
      * Initial State
      */
 
-    app_state_t *state =
-        app_state_get();
-
-    state->comm_state =
-        COMM_STATE_IDLE;
-
-    state->device_count =
-        0;
-
-
+    comm_service_reset();
 
     /*
      * Initial Render

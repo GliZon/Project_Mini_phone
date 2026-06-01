@@ -5,14 +5,49 @@
 // #include "app_state.h"
 #include "settings_service.h"
 #include "lvgl.h"
+#include "text_editor_screen.h"
+#include <string.h>
+
+
+static void settings_screen_refresh(
+    void
+);
 
 // #include <stdio.h>
 
 static list_screen_model_t g_settings_model;
-
+static char g_device_name_buffer[32];
 static settings_screen_t g_settings;
 
 
+// editor_text_screen
+static void on_device_name_done(
+    void *context,
+    const char *text
+)
+{
+    settings_service_set_device_name(
+        text
+    );
+
+    settings_screen_refresh();
+}
+
+static text_editor_model_t
+g_device_name_editor =
+{
+    .title = "Device Name",
+
+    .buffer = g_device_name_buffer,
+
+    .max_length = 32,
+
+    .on_done = on_device_name_done,
+
+    .context = NULL
+};
+
+// list_screen
 static const char *settings_get_item_text(
     void *context,
     uint16_t index
@@ -44,10 +79,17 @@ static void settings_on_item_selected(
     {
         case SETTINGS_ITEM_DEVICE_NAME:
 
-            /*
-             * Future:
-             * text_editor_open(...)
-             */
+            strncpy(
+                g_device_name_buffer,
+
+                settings_service_get_device_name(),
+
+                sizeof(g_device_name_buffer)
+            );
+
+            text_editor_open(
+                &g_device_name_editor
+            );
 
             break;
 
@@ -86,7 +128,7 @@ static void settings_screen_refresh(void)
         g_settings.items[
             SETTINGS_ITEM_DEVICE_TYPE
         ].value,
-        
+
         device_type_to_string(
             settings_service_get_device_type()
         )
