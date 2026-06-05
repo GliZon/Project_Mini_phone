@@ -1,38 +1,41 @@
 #pragma once
 
+#include "ui_event.h"
+
 #include <stdint.h>
 
+/*
+ * Lifecycle
+ */
 
-
-typedef void (*text_done_cb_t)(
-    void *context,
-    const char *text
+void text_editor_screen_create(
+    void
 );
 
-
-
-typedef struct
-{
-    const char *title;
-
-    char *buffer;
-
-    uint16_t max_length;
-
-    text_done_cb_t on_done;
-
-    void *context;
-
-} text_editor_model_t;
-
-
-
-void text_editor_open(
-    text_editor_model_t *model
+void text_editor_screen_destroy(
+    void
 );
 
+void text_editor_screen_on_enter(
+    void
+);
 
+void text_editor_screen_on_exit(
+    void
+);
 
-text_editor_model_t *text_editor_get_model(
+void text_editor_screen_update(
+    uint32_t dt_ms
+);
+
+void text_editor_screen_handle_event(
+    ui_event_t *event
+);
+
+/*
+ * Refresh UI
+ */
+
+void text_editor_screen_refresh(
     void
 );

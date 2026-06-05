@@ -13,6 +13,9 @@ idf_component_register(
         "screens/messages_screen.c"
         "screens/battery_screen.c"
         "screens/comm_screen.c"
+        "screens/common/list_screen.c"
+        "screens/common/text_editor_screen.c"
+
 
         "managers/screen_manager.c"
 
@@ -22,9 +25,7 @@ idf_component_register(
         "services/message_service.c"
         "services/storage_service.c"
         "services/comm_service.c"
-
-        "screens/common/list_screen.c"
-        "screens/common/text_editor_screen.c"
+        "services/text_editor.c"
 
     INCLUDE_DIRS
         "include"
