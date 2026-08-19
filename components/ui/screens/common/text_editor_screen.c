@@ -1,6 +1,8 @@
 #include "text_editor_screen.h"
 #include "text_editor.h"
 #include "lvgl.h"
+#include "input_events.h"
+#include "ui_event.h"
 
 
 
@@ -56,9 +58,7 @@ void text_editor_screen_handle_event(
         return;
     }
 
-    text_editor_handle_input(
-        &event->input
-    );
+    text_editor_handle_input(event);
 
     text_editor_screen_refresh();
 }

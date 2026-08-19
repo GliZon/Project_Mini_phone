@@ -7,7 +7,7 @@ typedef enum
 {
     UI_EVENT_NONE,
 
-    UI_EVENT_UP,
+    UI_EVENT_UP,    
     UI_EVENT_DOWN,
     UI_EVENT_LEFT,
     UI_EVENT_RIGHT,
@@ -25,6 +25,15 @@ typedef enum
     UI_EVENT_7,
     UI_EVENT_8,
     UI_EVENT_9,
+
+    UI_EVENT_STAR,
+    UI_EVENT_HASH,
+
+
+    UI_EVENT_A,
+    UI_EVENT_B,
+    UI_EVENT_C,
+    UI_EVENT_D,
 
     UI_EVENT_MENU_BUTTON
 

@@ -4,16 +4,12 @@
 
 #include <string.h>
 
-
-
 /*
  * Active Model
  */
 
 static text_editor_model_t *g_model =
     NULL;
-
-
 
 /*
  * Working Buffer
@@ -23,22 +19,18 @@ static char g_edit_buffer[
     TEXT_EDITOR_MAX_LEN
 ];
 
-
-
 /*
  * Multi Tap State
  */
 
-static char g_last_key =
-    '\0';
+static ui_event_type_t g_last_key =
+    UI_EVENT_NONE;
 
 static uint32_t g_last_press_ms =
     0;
 
 static uint8_t g_cycle_index =
     0;
-
-
 
 /*
  * Key Map
@@ -58,7 +50,31 @@ static const char *g_keymap[10] =
     "WXYZ"
 };
 
+/*
+ * Helpers
+ */
 
+static int event_to_digit(
+    ui_event_type_t type
+)
+{
+    switch(type)
+    {
+        case UI_EVENT_0: return 0;
+        case UI_EVENT_1: return 1;
+        case UI_EVENT_2: return 2;
+        case UI_EVENT_3: return 3;
+        case UI_EVENT_4: return 4;
+        case UI_EVENT_5: return 5;
+        case UI_EVENT_6: return 6;
+        case UI_EVENT_7: return 7;
+        case UI_EVENT_8: return 8;
+        case UI_EVENT_9: return 9;
+
+        default:
+            return -1;
+    }
+}
 
 /*
  * Begin Editing
@@ -99,12 +115,24 @@ void text_editor_begin(
         );
     }
 
-    g_last_key = '\0';
-    g_last_press_ms = 0;
-    g_cycle_index = 0;
+    g_last_key =
+        UI_EVENT_NONE;
+
+    g_last_press_ms =
+        0;
+
+    g_cycle_index =
+        0;
 }
 
-
+void text_editor_open(
+    text_editor_model_t *model
+)
+{
+    text_editor_begin(
+        model
+    );
+}
 
 /*
  * Save
@@ -114,12 +142,10 @@ void text_editor_save(
     void
 )
 {
-    if(g_model == NULL)
-    {
-        return;
-    }
-
-    if(g_model->buffer == NULL)
+    if(
+        g_model == NULL ||
+        g_model->buffer == NULL
+    )
     {
         return;
     }
@@ -151,8 +177,6 @@ void text_editor_save(
     );
 }
 
-
-
 /*
  * Cancel
  */
@@ -169,8 +193,6 @@ void text_editor_cancel(
         sizeof(g_edit_buffer)
     );
 }
-
-
 
 /*
  * Append
@@ -202,8 +224,6 @@ bool text_editor_append_char(
     return true;
 }
 
-
-
 /*
  * Replace Last
  */
@@ -224,8 +244,6 @@ bool text_editor_replace_last_char(
 
     return true;
 }
-
-
 
 /*
  * Backspace
@@ -248,14 +266,12 @@ bool text_editor_backspace(
     return true;
 }
 
-
-
 /*
  * Input Handler
  */
 
 void text_editor_handle_input(
-    const input_event_t *event
+    const ui_event_t *event
 )
 {
     if(event == NULL)
@@ -263,42 +279,36 @@ void text_editor_handle_input(
         return;
     }
 
-    if(
-        event->type !=
-        INPUT_EVENT_PRESS
-    )
+    switch(event->type)
     {
-        return;
-    }
-
-    switch(event->key)
-    {
-        case 'A':
-
+        case UI_EVENT_A:
             text_editor_cancel();
             return;
 
-        case 'D':
-
+        case UI_EVENT_D:
             text_editor_save();
             return;
 
-        case '*':
-
+        case UI_EVENT_STAR:
             text_editor_backspace();
             return;
 
-        case '0':
-
-            text_editor_append_char(
-                ' '
-            );
+        case UI_EVENT_0:
+            text_editor_append_char(' ');
             return;
+
+        default:
+            break;
     }
 
+    int digit =
+        event_to_digit(
+            event->type
+        );
+
     if(
-        event->key < '2' ||
-        event->key > '9'
+        digit < 2 ||
+        digit > 9
     )
     {
         return;
@@ -306,9 +316,6 @@ void text_editor_handle_input(
 
     uint32_t now =
         lv_tick_get();
-
-    uint8_t digit =
-        event->key - '0';
 
     const char *letters =
         g_keymap[digit];
@@ -323,7 +330,7 @@ void text_editor_handle_input(
 
     if(
         g_last_key ==
-        event->key &&
+        event->type &&
         (now - g_last_press_ms)
         <
         MULTITAP_TIMEOUT_MS
@@ -334,9 +341,7 @@ void text_editor_handle_input(
         g_cycle_index %= count;
 
         text_editor_replace_last_char(
-            letters[
-                g_cycle_index
-            ]
+            letters[g_cycle_index]
         );
     }
     else
@@ -349,13 +354,11 @@ void text_editor_handle_input(
     }
 
     g_last_key =
-        event->key;
+        event->type;
 
     g_last_press_ms =
         now;
 }
-
-
 
 /*
  * Accessors
@@ -381,5 +384,14 @@ uint16_t text_editor_get_length(
 {
     return strlen(
         g_edit_buffer
+    );
+}
+
+bool text_editor_is_active(
+    void
+)
+{
+    return (
+        g_model != NULL
     );
 }

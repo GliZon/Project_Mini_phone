@@ -7,6 +7,7 @@
 #include "lvgl.h"
 #include "text_editor_screen.h"
 #include <string.h>
+#include "text_editor.h"
 
 
 static void settings_screen_refresh(
@@ -46,6 +47,14 @@ g_device_name_editor =
 
     .context = NULL
 };
+
+    text_editor_open(
+        &g_name_editor
+    );
+
+    screen_manager_load(
+        SCREEN_TEXT_EDITOR
+    );
 
 // list_screen
 static const char *settings_get_item_text(
@@ -87,7 +96,7 @@ static void settings_on_item_selected(
                 sizeof(g_device_name_buffer)
             );
 
-            text_editor_open(
+            text_editor_begin(
                 &g_device_name_editor
             );
 
