@@ -1,7 +1,8 @@
 #include "text_editor_screen.h"
 #include "text_editor.h"
+#include "screen_manager.h"
+#include "ui_input.h"
 #include "lvgl.h"
-#include "input_events.h"
 #include "ui_event.h"
 
 
@@ -13,6 +14,48 @@
 static lv_obj_t *title_label;
 static lv_obj_t *text_label;
 static lv_obj_t *help_label;
+
+
+
+/*
+ * Return Targets
+ */
+
+static screen_id_t g_return_on_save =
+    SCREEN_HOME;
+
+static screen_id_t g_return_on_cancel =
+    SCREEN_HOME;
+
+
+
+/*
+ * Open
+ */
+
+void text_editor_screen_open(
+    text_editor_model_t *model,
+    screen_id_t return_on_save,
+    screen_id_t return_on_cancel
+)
+{
+    text_editor_begin(model);
+
+    if(!text_editor_is_active())
+    {
+        return;
+    }
+
+    g_return_on_save =
+        return_on_save;
+
+    g_return_on_cancel =
+        return_on_cancel;
+
+    screen_manager_load(
+        SCREEN_TEXT_EDITOR
+    );
+}
 
 
 
@@ -34,7 +77,7 @@ void text_editor_screen_refresh(
 
     lv_label_set_text(
         title_label,
-        model->title
+        model->title ? model->title : "Edit"
     );
 
     lv_label_set_text(
@@ -58,6 +101,34 @@ void text_editor_screen_handle_event(
         return;
     }
 
+    /*
+     * Save and cancel are taken here rather than
+     * in text_editor so the screen knows which
+     * outcome happened and where to go next.
+     */
+
+    if(event->type == UI_EVENT_D)
+    {
+        text_editor_save();
+
+        screen_manager_load(
+            g_return_on_save
+        );
+
+        return;
+    }
+
+    if(event->type == UI_EVENT_A)
+    {
+        text_editor_cancel();
+
+        screen_manager_load(
+            g_return_on_cancel
+        );
+
+        return;
+    }
+
     text_editor_handle_input(event);
 
     text_editor_screen_refresh();
@@ -75,6 +146,14 @@ void text_editor_screen_create(
 {
     lv_obj_t *screen =
         lv_screen_active();
+
+    lv_obj_set_style_bg_color(
+        screen,
+        lv_color_black(),
+        0
+    );
+
+    ui_input_set_raw_mode(true);
 
 
 
@@ -100,6 +179,16 @@ void text_editor_screen_create(
 
     text_label =
         lv_label_create(screen);
+
+    lv_obj_set_width(
+        text_label,
+        200
+    );
+
+    lv_label_set_long_mode(
+        text_label,
+        LV_LABEL_LONG_WRAP
+    );
 
     lv_obj_align(
         text_label,

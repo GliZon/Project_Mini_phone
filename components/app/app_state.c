@@ -26,22 +26,40 @@ void app_state_init(void)
         "DEVICE"
     );
 
-        strcpy(
-        g_app_state.message.quick_messages[0],
-        "HELP"
-    );
-
-    strcpy(
-        g_app_state.message.quick_messages[1],
-        "COME HERE"
-    );
-
-    strcpy(
-        g_app_state.message.quick_messages[2],
+    static const char *DEFAULT_QUICK_MESSAGES[
+        MAX_QUICK_MESSAGES
+    ] =
+    {
+        "FWD",
+        "BWD",
+        "STOP",
+        "LEFT",
+        "RIGHT",
+        "HOLD",
+        "OK",
+        "HELP",
         "LOW BATTERY"
-    );
+    };
+
+    for(
+        int i = 0;
+        i < MAX_QUICK_MESSAGES;
+        i++
+    )
+    {
+        strncpy(
+            g_app_state.message.quick_messages[i],
+            DEFAULT_QUICK_MESSAGES[i],
+            QUICK_MESSAGE_LEN - 1
+        );
+    }
 
     g_app_state.message.draft[0] = '\0';
+
+    g_app_state.message.outgoing[0] = '\0';
+
+    g_app_state.message.recipient =
+        MESSAGE_RECIPIENT_ALL;
 
     g_app_state.device_type = DEVICE_TYPE_D;
     

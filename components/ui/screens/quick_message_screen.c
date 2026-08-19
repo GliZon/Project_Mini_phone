@@ -1,0 +1,232 @@
+#include "quick_message_screen.h"
+
+#include "message_service.h"
+#include "screen_manager.h"
+#include "ui_input.h"
+#include "app_state.h"
+
+#include "lvgl.h"
+
+#include <stdio.h>
+
+
+
+static lv_obj_t *g_rows[
+    MAX_QUICK_MESSAGES
+];
+
+
+
+/*
+ * Digit To Index
+ *
+ * 1..9 map to slots 0..8. 0 is not a slot.
+ */
+
+static int event_to_slot(
+    ui_event_type_t type
+)
+{
+    if(
+        type >= UI_EVENT_1 &&
+        type <= UI_EVENT_9
+    )
+    {
+        return (int)(type - UI_EVENT_1);
+    }
+
+    return -1;
+}
+
+
+
+/*
+ * Event Handler
+ */
+
+void quick_message_screen_handle_event(
+    ui_event_t *event
+)
+{
+    if(event == NULL)
+    {
+        return;
+    }
+
+    if(event->type == UI_EVENT_A)
+    {
+        screen_manager_load(
+            SCREEN_MESSAGES
+        );
+
+        return;
+    }
+
+    int slot =
+        event_to_slot(event->type);
+
+    if(slot < 0)
+    {
+        return;
+    }
+
+    const char *text =
+        message_service_get_quick_message(
+            (uint8_t)slot
+        );
+
+    if(
+        text == NULL ||
+        text[0] == '\0'
+    )
+    {
+        return;
+    }
+
+    message_service_stage_outgoing(text);
+
+    screen_manager_load(
+        SCREEN_RECIPIENT
+    );
+}
+
+
+
+/*
+ * Lifecycle
+ */
+
+void quick_message_screen_destroy(void)
+{
+    for(
+        int i = 0;
+        i < MAX_QUICK_MESSAGES;
+        i++
+    )
+    {
+        g_rows[i] = NULL;
+    }
+}
+
+void quick_message_screen_on_enter(void)
+{
+}
+
+void quick_message_screen_on_exit(void)
+{
+}
+
+void quick_message_screen_update(
+    uint32_t dt_ms
+)
+{
+    (void)dt_ms;
+}
+
+
+
+/*
+ * Create
+ */
+
+void quick_message_screen_create(void)
+{
+    lv_obj_t *screen =
+        lv_screen_active();
+
+    lv_obj_set_style_bg_color(
+        screen,
+        lv_color_black(),
+        0
+    );
+
+    /*
+     * Digits pick a slot directly, so LVGL must
+     * not consume them for navigation.
+     */
+
+    ui_input_set_raw_mode(true);
+
+
+
+    /*
+     * Title
+     */
+
+    lv_obj_t *title =
+        lv_label_create(screen);
+
+    lv_label_set_text(
+        title,
+        "Quick Messages"
+    );
+
+    lv_obj_align(
+        title,
+        LV_ALIGN_TOP_MID,
+        0,
+        3
+    );
+
+
+
+    /*
+     * Slots
+     */
+
+    uint8_t count =
+        message_service_get_quick_message_count();
+
+    for(
+        uint8_t i = 0;
+        i < count;
+        i++
+    )
+    {
+        char buffer[QUICK_MESSAGE_LEN + 8];
+
+        snprintf(
+            buffer,
+            sizeof(buffer),
+            "%u  %s",
+            (unsigned)(i + 1),
+            message_service_get_quick_message(i)
+        );
+
+        g_rows[i] =
+            lv_label_create(screen);
+
+        lv_label_set_text(
+            g_rows[i],
+            buffer
+        );
+
+        lv_obj_align(
+            g_rows[i],
+            LV_ALIGN_TOP_LEFT,
+            10,
+            20 + (i * 12)
+        );
+    }
+
+
+
+    /*
+     * Help
+     */
+
+    lv_obj_t *help =
+        lv_label_create(screen);
+
+    lv_label_set_text(
+        help,
+        "1-9=SEND  A=BACK"
+    );
+
+    lv_obj_align(
+        help,
+        LV_ALIGN_BOTTOM_MID,
+        0,
+        -3
+    );
+}

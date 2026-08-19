@@ -13,6 +13,8 @@ idf_component_register(
         "screens/messages_screen.c"
         "screens/battery_screen.c"
         "screens/comm_screen.c"
+        "screens/quick_message_screen.c"
+        "screens/recipient_screen.c"
         "screens/common/list_screen.c"
         "screens/common/text_editor_screen.c"
 

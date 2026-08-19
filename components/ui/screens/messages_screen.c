@@ -2,8 +2,14 @@
 
 #include "screen_manager.h"
 #include "ui_input.h"
+#include "text_editor_screen.h"
+#include "text_editor.h"
+#include "message_service.h"
+#include "app_state.h"
 
 #include "lvgl.h"
+
+#include <string.h>
 
 
 
@@ -24,6 +30,45 @@ static lv_group_t *g_group;
 static lv_obj_t *g_buttons[
     MESSAGE_MENU_COUNT
 ];
+
+static char g_compose_buffer[
+    MESSAGE_DRAFT_LEN
+];
+
+
+
+/*
+ * Compose
+ *
+ * Runs while the editor screen is up, so it
+ * touches state only, never this screen's
+ * objects.
+ */
+
+static void on_compose_done(
+    void *context,
+    const char *text
+)
+{
+    (void)context;
+
+    message_service_set_draft(text);
+
+    message_service_stage_outgoing(text);
+}
+
+static text_editor_model_t g_compose_editor =
+{
+    .title = "Write Message",
+
+    .buffer = g_compose_buffer,
+
+    .max_length = MESSAGE_DRAFT_LEN,
+
+    .on_done = on_compose_done,
+
+    .context = NULL
+};
 
 
 
@@ -53,21 +98,31 @@ static void menu_item_event_cb(
     {
         case MESSAGE_MENU_QUICK_MESSAGES:
 
-            /*
-             * Future:
-             * screen_manager_load(
-             *     SCREEN_QUICK_MESSAGES
-             * );
-             */
+            screen_manager_load(
+                SCREEN_QUICK_MESSAGES
+            );
 
             break;
 
         case MESSAGE_MENU_WRITE_MESSAGE:
 
-            /*
-             * Future:
-             * text_editor_screen_open(...)
-             */
+            strncpy(
+                g_compose_buffer,
+
+                message_service_get_draft(),
+
+                sizeof(g_compose_buffer) - 1
+            );
+
+            g_compose_buffer[
+                sizeof(g_compose_buffer) - 1
+            ] = '\0';
+
+            text_editor_screen_open(
+                &g_compose_editor,
+                SCREEN_RECIPIENT,
+                SCREEN_MESSAGES
+            );
 
             break;
 

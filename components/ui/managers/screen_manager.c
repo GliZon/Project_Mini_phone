@@ -5,6 +5,10 @@
 #include "messages_screen.h"
 #include "battery_screen.h"
 #include "comm_screen.h"
+#include "text_editor_screen.h"
+#include "quick_message_screen.h"
+#include "recipient_screen.h"
+#include "ui_input.h"
 
 #include "lvgl.h"
 
@@ -20,6 +24,13 @@ void screen_manager_load(
     );
 
     current_screen = screen;
+
+    /*
+     * Screens that want raw digits opt back in
+     * from their own create().
+     */
+
+    ui_input_set_raw_mode(false);
 
     switch(screen)
     {
@@ -41,6 +52,18 @@ void screen_manager_load(
 
         case SCREEN_MESSAGES:
             messages_screen_create();
+            break;
+
+        case SCREEN_TEXT_EDITOR:
+            text_editor_screen_create();
+            break;
+
+        case SCREEN_QUICK_MESSAGES:
+            quick_message_screen_create();
+            break;
+
+        case SCREEN_RECIPIENT:
+            recipient_screen_create();
             break;
 
         default:
@@ -75,6 +98,18 @@ void screen_manager_handle_event(
 
         case SCREEN_COMM:
             comm_screen_handle_event(event);
+            break;
+
+        case SCREEN_TEXT_EDITOR:
+            text_editor_screen_handle_event(event);
+            break;
+
+        case SCREEN_QUICK_MESSAGES:
+            quick_message_screen_handle_event(event);
+            break;
+
+        case SCREEN_RECIPIENT:
+            recipient_screen_handle_event(event);
             break;
 
         default:

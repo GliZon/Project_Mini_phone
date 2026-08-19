@@ -10,6 +10,9 @@
 #define QUICK_MESSAGE_LEN    64
 #define MESSAGE_DRAFT_LEN    256
 
+/* Broadcast: send to every known device */
+#define MESSAGE_RECIPIENT_ALL 0xFF
+
 
 /*
  * Message State
@@ -26,6 +29,12 @@ typedef struct
     char draft[
         MESSAGE_DRAFT_LEN
     ];
+
+    char outgoing[
+        MESSAGE_DRAFT_LEN
+    ];
+
+    uint8_t recipient;
 
 } message_state_t;
 

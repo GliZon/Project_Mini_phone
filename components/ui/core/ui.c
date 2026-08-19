@@ -105,7 +105,17 @@ void ui_init(void)
 
 void ui_task(void)
 {
+    ui_input_poll();
+
     lv_timer_handler();
+
+    /*
+     * Dispatched after the handler because event
+     * handlers load screens, which frees the
+     * objects LVGL is still walking.
+     */
+
+    ui_input_process_events();
 }
 // void ui_task(void)
 // {

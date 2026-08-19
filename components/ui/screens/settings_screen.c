@@ -21,17 +21,24 @@ static char g_device_name_buffer[32];
 static settings_screen_t g_settings;
 
 
-// editor_text_screen
+/*
+ * Editor
+ *
+ * Runs while the editor screen is up, so it
+ * touches state only. This screen is rebuilt on
+ * return and refreshes itself then.
+ */
+
 static void on_device_name_done(
     void *context,
     const char *text
 )
 {
+    (void)context;
+
     settings_service_set_device_name(
         text
     );
-
-    settings_screen_refresh();
 }
 
 static text_editor_model_t
@@ -47,14 +54,6 @@ g_device_name_editor =
 
     .context = NULL
 };
-
-    // text_editor_open(
-    //     &g_name_editor
-    // );
-
-    // screen_manager_load(
-    //     SCREEN_TEXT_EDITOR
-    // );
 
 // list_screen
 static const char *settings_get_item_text(
@@ -93,11 +92,17 @@ static void settings_on_item_selected(
 
                 settings_service_get_device_name(),
 
-                sizeof(g_device_name_buffer)
+                sizeof(g_device_name_buffer) - 1
             );
 
-            text_editor_begin(
-                &g_device_name_editor
+            g_device_name_buffer[
+                sizeof(g_device_name_buffer) - 1
+            ] = '\0';
+
+            text_editor_screen_open(
+                &g_device_name_editor,
+                SCREEN_SETTINGS,
+                SCREEN_SETTINGS
             );
 
             break;
@@ -184,6 +189,7 @@ static void setting_item_event_cb(lv_event_t *e)
             index
         );
     }
+
     settings_screen_refresh();
 }
 

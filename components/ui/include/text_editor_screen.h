@@ -1,8 +1,24 @@
 #pragma once
 
 #include "ui_event.h"
+#include "text_editor.h"
+#include "screen_manager.h"
 
 #include <stdint.h>
+
+/*
+ * Open
+ *
+ * The one entry point callers use. Begins the
+ * edit, remembers where each outcome returns to,
+ * and loads the editor.
+ */
+
+void text_editor_screen_open(
+    text_editor_model_t *model,
+    screen_id_t return_on_save,
+    screen_id_t return_on_cancel
+);
 
 /*
  * Lifecycle
