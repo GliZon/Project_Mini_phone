@@ -6,7 +6,6 @@
 /*
  * Button IDs
  */
-
 typedef enum
 {
     MENU_BUTTON_BATTERY,
@@ -19,7 +18,6 @@ typedef enum
 /*
  * Button Create
  */
-
 lv_obj_t *menu_button_create(
     lv_obj_t *parent,
     lv_group_t *group,

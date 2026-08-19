@@ -163,7 +163,6 @@ static void comm_screen_refresh(void)
 /*
  * Device Selected
  */
-
 static void device_event_cb(
     lv_event_t *e
 )

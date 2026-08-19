@@ -48,13 +48,13 @@ g_device_name_editor =
     .context = NULL
 };
 
-    text_editor_open(
-        &g_name_editor
-    );
+    // text_editor_open(
+    //     &g_name_editor
+    // );
 
-    screen_manager_load(
-        SCREEN_TEXT_EDITOR
-    );
+    // screen_manager_load(
+    //     SCREEN_TEXT_EDITOR
+    // );
 
 // list_screen
 static const char *settings_get_item_text(
@@ -184,7 +184,6 @@ static void setting_item_event_cb(lv_event_t *e)
             index
         );
     }
-
     settings_screen_refresh();
 }
 
