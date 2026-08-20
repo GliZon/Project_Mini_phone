@@ -19,15 +19,51 @@ static const char *TAG = "SCREEN_MGR";
 static screen_id_t current_screen =
     SCREEN_HOME;
 
+static screen_id_t g_pending_screen =
+    SCREEN_HOME;
+
+static bool g_pending;
+
+/*
+ * Load
+ *
+ * Every caller - LVGL click callbacks (Back,
+ * menu buttons, settings rows) and our own
+ * ui_event handlers alike - used to run
+ * lv_obj_clean() and rebuild the screen
+ * synchronously, right here. Click callbacks run
+ * from inside lv_timer_handler(), so that tore
+ * down objects LVGL was still using mid-event and
+ * corrupted its object tree - the settings-item
+ * crash. This just records what was asked for;
+ * screen_manager_process() does the real work
+ * once per tick, after lv_timer_handler() has
+ * returned.
+ */
+
 void screen_manager_load(
     screen_id_t screen
 )
 {
+    g_pending_screen = screen;
+
+    g_pending = true;
+}
+
+void screen_manager_process(void)
+{
+    if(!g_pending)
+    {
+        return;
+    }
+
+    g_pending = false;
+
     lv_obj_clean(
         lv_screen_active()
     );
 
-    current_screen = screen;
+    current_screen = g_pending_screen;
 
     /*
      * Screens that want raw digits opt back in
@@ -36,7 +72,7 @@ void screen_manager_load(
 
     ui_input_set_raw_mode(false);
 
-    switch(screen)
+    switch(current_screen)
     {
         case SCREEN_HOME:
             home_screen_create();

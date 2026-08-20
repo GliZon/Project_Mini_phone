@@ -101,6 +101,14 @@ void ui_init(void)
     screen_manager_load(
         SCREEN_HOME
     );
+
+    /*
+     * Safe here: nothing is on the LVGL callback
+     * stack yet, so applying immediately renders
+     * Home without waiting for the first tick.
+     */
+
+    screen_manager_process();
 }
 
 void ui_task(void)
@@ -110,12 +118,20 @@ void ui_task(void)
     lv_timer_handler();
 
     /*
-     * Dispatched after the handler because event
-     * handlers load screens, which frees the
-     * objects LVGL is still walking.
+     * Both run after the handler: LVGL click
+     * callbacks (Back, menu buttons, settings
+     * rows) and our own ui_event handlers can
+     * both call screen_manager_load(), which now
+     * only records the request. Applying it here,
+     * and dispatching ui_events here, keeps
+     * lv_obj_clean()/create() off the call stack
+     * lv_timer_handler() is still using when a
+     * click callback is what triggered the load.
      */
 
     ui_input_process_events();
+
+    screen_manager_process();
 }
 // void ui_task(void)
 // {

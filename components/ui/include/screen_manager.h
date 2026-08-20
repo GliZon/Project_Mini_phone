@@ -22,6 +22,17 @@ void screen_manager_load(
     screen_id_t screen
 );
 
+/*
+ * Applies the pending load() request, if any.
+ * Must run outside lv_timer_handler()'s call
+ * stack - see the comment on screen_manager_load()
+ * for why.
+ */
+
+void screen_manager_process(
+    void
+);
+
 
 
 void screen_manager_handle_event(
