@@ -50,6 +50,11 @@ void screen_manager_load(
     g_pending = true;
 }
 
+bool screen_manager_is_pending(void)
+{
+    return g_pending;
+}
+
 void screen_manager_process(void)
 {
     if(!g_pending)

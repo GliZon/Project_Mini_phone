@@ -190,6 +190,20 @@ static void setting_item_event_cb(lv_event_t *e)
         );
     }
 
+    /*
+     * Device Name just requested leaving this
+     * screen (text editor, via screen_manager_load).
+     * That's only recorded until this tick ends -
+     * screen_manager_process() hasn't torn anything
+     * down yet - but there's no reason to touch
+     * this screen's own labels on the way out.
+     */
+
+    if(screen_manager_is_pending())
+    {
+        return;
+    }
+
     settings_screen_refresh();
 }
 

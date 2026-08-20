@@ -3,6 +3,8 @@
 
 #include "ui_event.h"
 
+#include <stdbool.h>
+
 typedef enum
 {
     SCREEN_HOME,
@@ -30,6 +32,18 @@ void screen_manager_load(
  */
 
 void screen_manager_process(
+    void
+);
+
+/*
+ * True from the moment load() is called until
+ * process() applies it. A screen's own refresh
+ * should check this and skip touching its widgets
+ * once it's about to be torn down - see the
+ * settings-item crash this was added for.
+ */
+
+bool screen_manager_is_pending(
     void
 );
 
