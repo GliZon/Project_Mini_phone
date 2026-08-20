@@ -156,6 +156,12 @@ void quick_message_screen_create(void)
     lv_obj_t *title =
         lv_label_create(screen);
 
+    lv_obj_set_style_text_color(
+        title,
+        lv_color_white(),
+        0
+    );
+
     lv_label_set_text(
         title,
         "Quick Messages"

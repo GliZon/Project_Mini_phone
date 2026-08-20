@@ -300,6 +300,12 @@ void comm_screen_create(void)
     g_comm.title =
         lv_label_create(screen);
 
+    lv_obj_set_style_text_color(
+        g_comm.title,
+        lv_color_white(),
+        0
+    );
+
     lv_label_set_text(
         g_comm.title,
         "Communication"
@@ -318,6 +324,12 @@ void comm_screen_create(void)
 
     g_comm.status =
         lv_label_create(screen);
+
+    lv_obj_set_style_text_color(
+        g_comm.status,
+        lv_color_white(),
+        0
+    );
 
     lv_obj_align(
         g_comm.status,
@@ -388,6 +400,12 @@ void comm_screen_create(void)
                 g_comm.device_items[i].container
             );
 
+        lv_obj_set_style_text_color(
+            g_comm.device_items[i].name,
+            lv_color_white(),
+            0
+        );
+
         lv_obj_align(
             g_comm.device_items[i].name,
             LV_ALIGN_LEFT_MID,
@@ -399,6 +417,12 @@ void comm_screen_create(void)
             lv_label_create(
                 g_comm.device_items[i].container
             );
+
+        lv_obj_set_style_text_color(
+            g_comm.device_items[i].status,
+            lv_color_white(),
+            0
+        );
 
         lv_obj_align(
             g_comm.device_items[i].status,
@@ -450,6 +474,12 @@ void comm_screen_create(void)
             g_comm.btn_scan
         );
 
+    lv_obj_set_style_text_color(
+        scan_label,
+        lv_color_white(),
+        0
+    );
+
     lv_label_set_text(
         scan_label,
         "Scan"
@@ -490,6 +520,12 @@ void comm_screen_create(void)
         lv_label_create(
             g_comm.btn_back
         );
+
+    lv_obj_set_style_text_color(
+        back_label,
+        lv_color_white(),
+        0
+    );
 
     lv_label_set_text(
         back_label,

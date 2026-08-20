@@ -213,6 +213,12 @@ void battery_screen_create(void)
     lv_obj_t *title =
         lv_label_create(screen);
 
+    lv_obj_set_style_text_color(
+        title,
+        lv_color_white(),
+        0
+    );
+
     lv_label_set_text(
         title,
         "Battery"
@@ -234,6 +240,12 @@ void battery_screen_create(void)
     g_battery.label_percent =
         lv_label_create(screen);
 
+    lv_obj_set_style_text_color(
+        g_battery.label_percent,
+        lv_color_white(),
+        0
+    );
+
     lv_obj_align(
         g_battery.label_percent,
         LV_ALIGN_TOP_LEFT,
@@ -250,6 +262,12 @@ void battery_screen_create(void)
     g_battery.label_runtime =
         lv_label_create(screen);
 
+    lv_obj_set_style_text_color(
+        g_battery.label_runtime,
+        lv_color_white(),
+        0
+    );
+
     lv_obj_align(
         g_battery.label_runtime,
         LV_ALIGN_TOP_LEFT,
@@ -265,6 +283,12 @@ void battery_screen_create(void)
 
     g_battery.label_status =
         lv_label_create(screen);
+
+    lv_obj_set_style_text_color(
+        g_battery.label_status,
+        lv_color_white(),
+        0
+    );
 
     lv_obj_align(
         g_battery.label_status,
@@ -297,6 +321,12 @@ void battery_screen_create(void)
 
     lv_obj_t *lbl_restart =
         lv_label_create(btn_restart);
+
+    lv_obj_set_style_text_color(
+        lbl_restart,
+        lv_color_white(),
+        0
+    );
 
     lv_label_set_text(
         lbl_restart,
@@ -340,6 +370,12 @@ void battery_screen_create(void)
 
     lv_obj_t *lbl_back =
         lv_label_create(btn_back);
+
+    lv_obj_set_style_text_color(
+        lbl_back,
+        lv_color_white(),
+        0
+    );
 
     lv_label_set_text(
         lbl_back,

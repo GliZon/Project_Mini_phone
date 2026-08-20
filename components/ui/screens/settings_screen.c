@@ -267,6 +267,7 @@ void settings_screen_create(void)
 
     // Title
     g_settings.title = lv_label_create(screen);
+    lv_obj_set_style_text_color(g_settings.title, lv_color_white(), 0);
     lv_label_set_text(g_settings.title, g_settings_model.title);
 
     lv_obj_align(
@@ -375,6 +376,12 @@ void settings_screen_create(void)
                 g_settings.items[i].container
             );
 
+        lv_obj_set_style_text_color(
+            g_settings.items[i].label,
+            lv_color_white(),
+            0
+        );
+
         lv_label_set_text(
             g_settings.items[i].label,
             g_settings_model.get_item_text(
@@ -395,6 +402,12 @@ void settings_screen_create(void)
             lv_label_create(
                 g_settings.items[i].container
             );
+
+        lv_obj_set_style_text_color(
+            g_settings.items[i].value,
+            lv_color_white(),
+            0
+        );
 
         lv_obj_align(
             g_settings.items[i].value,
@@ -455,6 +468,12 @@ void settings_screen_create(void)
         lv_label_create(
             g_settings.btn_back
         );
+
+    lv_obj_set_style_text_color(
+        label_back,
+        lv_color_white(),
+        0
+    );
 
     lv_label_set_text(
         label_back,

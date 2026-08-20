@@ -176,6 +176,12 @@ void text_editor_screen_create(
     title_label =
         lv_label_create(screen);
 
+    lv_obj_set_style_text_color(
+        title_label,
+        lv_color_white(),
+        0
+    );
+
     lv_obj_align(
         title_label,
         LV_ALIGN_TOP_MID,

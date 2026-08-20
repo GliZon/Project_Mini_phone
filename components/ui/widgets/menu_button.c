@@ -148,6 +148,12 @@ lv_obj_t *menu_button_create(
     lv_obj_t *value =
         lv_label_create(btn);
 
+    lv_obj_set_style_text_color(
+        value,
+        lv_color_white(),
+        0
+    );
+
     lv_label_set_text(
         value,
         value_text
@@ -198,6 +204,12 @@ lv_obj_t *menu_button_create(
 
     lv_obj_t *label =
         lv_label_create(btn);
+
+    lv_obj_set_style_text_color(
+        label,
+        lv_color_white(),
+        0
+    );
 
     lv_label_set_text(
         label,
