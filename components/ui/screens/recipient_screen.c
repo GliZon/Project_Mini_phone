@@ -97,6 +97,18 @@ static lv_obj_t *create_row(
     lv_obj_t *label =
         lv_label_create(row);
 
+    /*
+     * Nested in a plain lv_obj_create() row, so
+     * it won't get the screen's default text
+     * color - set it explicitly.
+     */
+
+    lv_obj_set_style_text_color(
+        label,
+        lv_color_white(),
+        0
+    );
+
     lv_obj_set_width(
         label,
         144

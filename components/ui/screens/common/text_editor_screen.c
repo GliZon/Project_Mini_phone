@@ -261,6 +261,20 @@ void text_editor_screen_create(
     text_label =
         lv_label_create(text_box);
 
+    /*
+     * A label nested in a plain lv_obj_create()
+     * container inherits that object's text color
+     * instead of the screen's default, which can
+     * land close enough to the card background to
+     * be unreadable. Set it explicitly.
+     */
+
+    lv_obj_set_style_text_color(
+        text_label,
+        lv_color_white(),
+        0
+    );
+
     lv_obj_set_width(
         text_label,
         144
