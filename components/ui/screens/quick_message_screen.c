@@ -177,6 +177,19 @@ void quick_message_screen_create(void)
     uint8_t count =
         message_service_get_quick_message_count();
 
+    /*
+     * The panel is 160x128 (see board.h), so 9
+     * rows have to run 2 columns wide - a single
+     * column at a legible row height runs off the
+     * bottom.
+     */
+
+    static const int16_t COL_X[2] = { 2, 81 };
+    static const int16_t COL_W    = 77;
+    static const int16_t ROW_H    = 13;
+    static const int16_t ROW_PITCH= 15;
+    static const int16_t START_Y  = 14;
+
     for(
         uint8_t i = 0;
         i < count;
@@ -188,36 +201,45 @@ void quick_message_screen_create(void)
         snprintf(
             buffer,
             sizeof(buffer),
-            "%u  %s",
+            "%u %s",
             (unsigned)(i + 1),
             message_service_get_quick_message(i)
         );
+
+        int col = i % 2;
+        int slot_row = i / 2;
 
         lv_obj_t *row =
             lv_obj_create(screen);
 
         lv_obj_set_size(
             row,
-            200,
-            16
+            COL_W,
+            ROW_H
         );
 
         lv_obj_align(
             row,
-            LV_ALIGN_TOP_MID,
-            0,
-            20 + (i * 19)
+            LV_ALIGN_TOP_LEFT,
+            COL_X[col],
+            START_Y + (slot_row * ROW_PITCH)
         );
 
         lv_obj_set_style_radius(
             row,
-            5,
+            3,
             0
         );
 
         lv_obj_set_style_bg_color(
             row,
             lv_color_hex(0x202020),
+            0
+        );
+
+        lv_obj_set_style_bg_opa(
+            row,
+            LV_OPA_COVER,
             0
         );
 
@@ -239,6 +261,12 @@ void quick_message_screen_create(void)
             0
         );
 
+        lv_obj_set_style_pad_all(
+            row,
+            0,
+            0
+        );
+
         lv_obj_clear_flag(
             row,
             LV_OBJ_FLAG_SCROLLABLE
@@ -246,6 +274,16 @@ void quick_message_screen_create(void)
 
         g_rows[i] =
             lv_label_create(row);
+
+        lv_obj_set_width(
+            g_rows[i],
+            COL_W - 6
+        );
+
+        lv_label_set_long_mode(
+            g_rows[i],
+            LV_LABEL_LONG_DOT
+        );
 
         lv_label_set_text(
             g_rows[i],
@@ -255,7 +293,7 @@ void quick_message_screen_create(void)
         lv_obj_align(
             g_rows[i],
             LV_ALIGN_LEFT_MID,
-            5,
+            3,
             0
         );
     }

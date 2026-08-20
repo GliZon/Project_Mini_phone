@@ -36,8 +36,8 @@ static lv_obj_t *create_row(
 
     lv_obj_set_size(
         row,
-        200,
-        16
+        150,
+        11
     );
 
     lv_obj_align(
@@ -49,13 +49,19 @@ static lv_obj_t *create_row(
 
     lv_obj_set_style_radius(
         row,
-        5,
+        3,
         0
     );
 
     lv_obj_set_style_bg_color(
         row,
         lv_color_hex(0x202020),
+        0
+    );
+
+    lv_obj_set_style_bg_opa(
+        row,
+        LV_OPA_COVER,
         0
     );
 
@@ -77,6 +83,12 @@ static lv_obj_t *create_row(
         0
     );
 
+    lv_obj_set_style_pad_all(
+        row,
+        0,
+        0
+    );
+
     lv_obj_clear_flag(
         row,
         LV_OBJ_FLAG_SCROLLABLE
@@ -84,6 +96,16 @@ static lv_obj_t *create_row(
 
     lv_obj_t *label =
         lv_label_create(row);
+
+    lv_obj_set_width(
+        label,
+        144
+    );
+
+    lv_label_set_long_mode(
+        label,
+        LV_LABEL_LONG_DOT
+    );
 
     lv_label_set_text(
         label,
@@ -93,7 +115,7 @@ static lv_obj_t *create_row(
     lv_obj_align(
         label,
         LV_ALIGN_LEFT_MID,
-        5,
+        3,
         0
     );
 
@@ -125,7 +147,7 @@ static void send_to(
         snprintf(
             buffer,
             sizeof(buffer),
-            "Sent to %s",
+            "Sent to %s  A=BACK",
             label
         );
 
@@ -138,7 +160,7 @@ static void send_to(
     {
         lv_label_set_text(
             g_status,
-            "Nothing to send"
+            "Nothing to send  A=BACK"
         );
     }
 
@@ -291,7 +313,7 @@ void recipient_screen_create(void)
 
     lv_obj_set_width(
         preview,
-        200
+        150
     );
 
     lv_label_set_long_mode(
@@ -306,9 +328,9 @@ void recipient_screen_create(void)
 
     lv_obj_align(
         preview,
-        LV_ALIGN_TOP_LEFT,
-        10,
-        18
+        LV_ALIGN_TOP_MID,
+        0,
+        13
     );
 
 
@@ -320,7 +342,7 @@ void recipient_screen_create(void)
     create_row(
         screen,
         "0  ALL",
-        38
+        24
     );
 
 
@@ -359,7 +381,7 @@ void recipient_screen_create(void)
         create_row(
             screen,
             buffer,
-            58 + (i * 19)
+            37 + (i * 13)
         );
     }
 
@@ -376,8 +398,8 @@ void recipient_screen_create(void)
         g_status,
 
         count > 0
-            ? "0=ALL  1-9=DEVICE"
-            : "No devices paired"
+            ? "0=ALL 1-9=DEV A=BACK"
+            : "No devices  A=BACK"
     );
 
     lv_obj_set_style_text_color(
@@ -388,33 +410,6 @@ void recipient_screen_create(void)
 
     lv_obj_align(
         g_status,
-        LV_ALIGN_BOTTOM_MID,
-        0,
-        -15
-    );
-
-
-
-    /*
-     * Help
-     */
-
-    lv_obj_t *help =
-        lv_label_create(screen);
-
-    lv_obj_set_style_text_color(
-        help,
-        lv_color_hex(0x808080),
-        0
-    );
-
-    lv_label_set_text(
-        help,
-        "A=BACK"
-    );
-
-    lv_obj_align(
-        help,
         LV_ALIGN_BOTTOM_MID,
         0,
         -3

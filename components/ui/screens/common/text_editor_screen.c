@@ -189,31 +189,43 @@ void text_editor_screen_create(
      * Edited Text
      */
 
+    /*
+     * The panel is 160x128 (see board.h), so the
+     * box has to fit that, not a desktop-sized
+     * guess.
+     */
+
     lv_obj_t *text_box =
         lv_obj_create(screen);
 
     lv_obj_set_size(
         text_box,
-        220,
-        90
+        150,
+        68
     );
 
     lv_obj_align(
         text_box,
         LV_ALIGN_TOP_MID,
         0,
-        36
+        22
     );
 
     lv_obj_set_style_radius(
         text_box,
-        5,
+        4,
         0
     );
 
     lv_obj_set_style_bg_color(
         text_box,
         lv_color_hex(0x202020),
+        0
+    );
+
+    lv_obj_set_style_bg_opa(
+        text_box,
+        LV_OPA_COVER,
         0
     );
 
@@ -235,6 +247,12 @@ void text_editor_screen_create(
         0
     );
 
+    lv_obj_set_style_pad_all(
+        text_box,
+        0,
+        0
+    );
+
     lv_obj_clear_flag(
         text_box,
         LV_OBJ_FLAG_SCROLLABLE
@@ -245,7 +263,7 @@ void text_editor_screen_create(
 
     lv_obj_set_width(
         text_label,
-        200
+        144
     );
 
     lv_label_set_long_mode(
@@ -256,8 +274,8 @@ void text_editor_screen_create(
     lv_obj_align(
         text_label,
         LV_ALIGN_TOP_LEFT,
-        5,
-        5
+        3,
+        3
     );
 
 
