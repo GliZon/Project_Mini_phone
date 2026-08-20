@@ -208,6 +208,14 @@ void ui_input_poll(void)
     ui_event_type_t type =
         key_to_ui_event(event.key);
 
+    ESP_LOGI(
+        TAG,
+        "key '%c' press -> ui_event %d (raw=%d)",
+        event.key,
+        (int)type,
+        (int)g_raw_mode
+    );
+
     if(type != UI_EVENT_NONE)
     {
         ui_queue_push(type);
@@ -238,6 +246,12 @@ void ui_input_process_events(void)
 
         g_ui_tail =
             queue_next(g_ui_tail);
+
+        ESP_LOGI(
+            TAG,
+            "dispatching ui_event %d",
+            (int)event.type
+        );
 
         ui_event_post(&event);
     }

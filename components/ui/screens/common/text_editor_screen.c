@@ -5,6 +5,10 @@
 #include "lvgl.h"
 #include "ui_event.h"
 
+#include "esp_log.h"
+
+static const char *TAG = "TEXT_EDITOR_SCR";
+
 
 
 /*
@@ -100,6 +104,14 @@ void text_editor_screen_handle_event(
     {
         return;
     }
+
+    ESP_LOGI(
+        TAG,
+        "handle_event: type=%d active=%d text='%s'",
+        (int)event->type,
+        (int)text_editor_is_active(),
+        text_editor_get_text()
+    );
 
     /*
      * Save and cancel are taken here rather than

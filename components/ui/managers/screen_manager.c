@@ -12,6 +12,10 @@
 
 #include "lvgl.h"
 
+#include "esp_log.h"
+
+static const char *TAG = "SCREEN_MGR";
+
 static screen_id_t current_screen =
     SCREEN_HOME;
 
@@ -78,6 +82,13 @@ void screen_manager_handle_event(
     ui_event_t *event
 )
 {
+    ESP_LOGI(
+        TAG,
+        "handle_event: screen=%d type=%d",
+        (int)current_screen,
+        (int)event->type
+    );
+
     switch(current_screen)
     {
         case SCREEN_HOME:
