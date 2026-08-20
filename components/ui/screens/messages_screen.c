@@ -288,6 +288,48 @@ void messages_screen_create(void)
             30 + (i * 28)
         );
 
+        lv_obj_set_style_radius(
+            g_buttons[i],
+            5,
+            0
+        );
+
+        lv_obj_set_style_shadow_width(
+            g_buttons[i],
+            0,
+            0
+        );
+
+        lv_obj_set_style_bg_color(
+            g_buttons[i],
+            lv_color_hex(0x202020),
+            LV_PART_MAIN | LV_STATE_DEFAULT
+        );
+
+        lv_obj_set_style_border_width(
+            g_buttons[i],
+            1,
+            LV_PART_MAIN | LV_STATE_DEFAULT
+        );
+
+        lv_obj_set_style_border_color(
+            g_buttons[i],
+            lv_color_hex(0x404040),
+            LV_PART_MAIN | LV_STATE_DEFAULT
+        );
+
+        lv_obj_set_style_bg_color(
+            g_buttons[i],
+            lv_color_hex(0x303030),
+            LV_PART_MAIN | LV_STATE_FOCUSED
+        );
+
+        lv_obj_set_style_border_color(
+            g_buttons[i],
+            lv_palette_main(LV_PALETTE_BLUE),
+            LV_PART_MAIN | LV_STATE_FOCUSED
+        );
+
         lv_obj_set_user_data(
             g_buttons[i],
             (void *)(uintptr_t)i

@@ -19,6 +19,90 @@ static bool g_sent;
 
 
 /*
+ * Row Card
+ *
+ * Same look as the settings/comm rows: grey card
+ * on the black screen background.
+ */
+
+static lv_obj_t *create_row(
+    lv_obj_t *screen,
+    const char *text,
+    int y
+)
+{
+    lv_obj_t *row =
+        lv_obj_create(screen);
+
+    lv_obj_set_size(
+        row,
+        200,
+        16
+    );
+
+    lv_obj_align(
+        row,
+        LV_ALIGN_TOP_MID,
+        0,
+        y
+    );
+
+    lv_obj_set_style_radius(
+        row,
+        5,
+        0
+    );
+
+    lv_obj_set_style_bg_color(
+        row,
+        lv_color_hex(0x202020),
+        0
+    );
+
+    lv_obj_set_style_border_width(
+        row,
+        1,
+        0
+    );
+
+    lv_obj_set_style_border_color(
+        row,
+        lv_color_hex(0x404040),
+        0
+    );
+
+    lv_obj_set_style_shadow_width(
+        row,
+        0,
+        0
+    );
+
+    lv_obj_clear_flag(
+        row,
+        LV_OBJ_FLAG_SCROLLABLE
+    );
+
+    lv_obj_t *label =
+        lv_label_create(row);
+
+    lv_label_set_text(
+        label,
+        text
+    );
+
+    lv_obj_align(
+        label,
+        LV_ALIGN_LEFT_MID,
+        5,
+        0
+    );
+
+    return row;
+}
+
+
+
+/*
  * Send
  */
 
@@ -233,19 +317,10 @@ void recipient_screen_create(void)
      * Broadcast
      */
 
-    lv_obj_t *all_row =
-        lv_label_create(screen);
-
-    lv_label_set_text(
-        all_row,
-        "0  ALL"
-    );
-
-    lv_obj_align(
-        all_row,
-        LV_ALIGN_TOP_LEFT,
-        10,
-        36
+    create_row(
+        screen,
+        "0  ALL",
+        38
     );
 
 
@@ -281,19 +356,10 @@ void recipient_screen_create(void)
             device->name
         );
 
-        lv_obj_t *row =
-            lv_label_create(screen);
-
-        lv_label_set_text(
-            row,
-            buffer
-        );
-
-        lv_obj_align(
-            row,
-            LV_ALIGN_TOP_LEFT,
-            10,
-            48 + (i * 12)
+        create_row(
+            screen,
+            buffer,
+            58 + (i * 19)
         );
     }
 
@@ -314,6 +380,12 @@ void recipient_screen_create(void)
             : "No devices paired"
     );
 
+    lv_obj_set_style_text_color(
+        g_status,
+        lv_color_hex(0x808080),
+        0
+    );
+
     lv_obj_align(
         g_status,
         LV_ALIGN_BOTTOM_MID,
@@ -329,6 +401,12 @@ void recipient_screen_create(void)
 
     lv_obj_t *help =
         lv_label_create(screen);
+
+    lv_obj_set_style_text_color(
+        help,
+        lv_color_hex(0x808080),
+        0
+    );
 
     lv_label_set_text(
         help,

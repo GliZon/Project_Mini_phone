@@ -189,8 +189,59 @@ void text_editor_screen_create(
      * Edited Text
      */
 
+    lv_obj_t *text_box =
+        lv_obj_create(screen);
+
+    lv_obj_set_size(
+        text_box,
+        220,
+        90
+    );
+
+    lv_obj_align(
+        text_box,
+        LV_ALIGN_TOP_MID,
+        0,
+        36
+    );
+
+    lv_obj_set_style_radius(
+        text_box,
+        5,
+        0
+    );
+
+    lv_obj_set_style_bg_color(
+        text_box,
+        lv_color_hex(0x202020),
+        0
+    );
+
+    lv_obj_set_style_border_width(
+        text_box,
+        1,
+        0
+    );
+
+    lv_obj_set_style_border_color(
+        text_box,
+        lv_color_hex(0x404040),
+        0
+    );
+
+    lv_obj_set_style_shadow_width(
+        text_box,
+        0,
+        0
+    );
+
+    lv_obj_clear_flag(
+        text_box,
+        LV_OBJ_FLAG_SCROLLABLE
+    );
+
     text_label =
-        lv_label_create(screen);
+        lv_label_create(text_box);
 
     lv_obj_set_width(
         text_label,
@@ -205,8 +256,8 @@ void text_editor_screen_create(
     lv_obj_align(
         text_label,
         LV_ALIGN_TOP_LEFT,
-        10,
-        40
+        5,
+        5
     );
 
 
@@ -222,6 +273,12 @@ void text_editor_screen_create(
         help_label,
         "*=DEL  0=SPACE\n"
         "A=CANCEL D=SAVE"
+    );
+
+    lv_obj_set_style_text_color(
+        help_label,
+        lv_color_hex(0x808080),
+        0
     );
 
     lv_obj_align(

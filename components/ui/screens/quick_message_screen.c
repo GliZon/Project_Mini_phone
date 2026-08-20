@@ -193,8 +193,59 @@ void quick_message_screen_create(void)
             message_service_get_quick_message(i)
         );
 
+        lv_obj_t *row =
+            lv_obj_create(screen);
+
+        lv_obj_set_size(
+            row,
+            200,
+            16
+        );
+
+        lv_obj_align(
+            row,
+            LV_ALIGN_TOP_MID,
+            0,
+            20 + (i * 19)
+        );
+
+        lv_obj_set_style_radius(
+            row,
+            5,
+            0
+        );
+
+        lv_obj_set_style_bg_color(
+            row,
+            lv_color_hex(0x202020),
+            0
+        );
+
+        lv_obj_set_style_border_width(
+            row,
+            1,
+            0
+        );
+
+        lv_obj_set_style_border_color(
+            row,
+            lv_color_hex(0x404040),
+            0
+        );
+
+        lv_obj_set_style_shadow_width(
+            row,
+            0,
+            0
+        );
+
+        lv_obj_clear_flag(
+            row,
+            LV_OBJ_FLAG_SCROLLABLE
+        );
+
         g_rows[i] =
-            lv_label_create(screen);
+            lv_label_create(row);
 
         lv_label_set_text(
             g_rows[i],
@@ -203,9 +254,9 @@ void quick_message_screen_create(void)
 
         lv_obj_align(
             g_rows[i],
-            LV_ALIGN_TOP_LEFT,
-            10,
-            20 + (i * 12)
+            LV_ALIGN_LEFT_MID,
+            5,
+            0
         );
     }
 
@@ -217,6 +268,12 @@ void quick_message_screen_create(void)
 
     lv_obj_t *help =
         lv_label_create(screen);
+
+    lv_obj_set_style_text_color(
+        help,
+        lv_color_hex(0x808080),
+        0
+    );
 
     lv_label_set_text(
         help,
